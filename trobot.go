@@ -8,31 +8,63 @@
 package trobot
 
 import (
-	"io"
 	"fmt"
 	"net/http"
+	"log"
+
+	"github.com/ziyao233/trobot/methods"
        )
 
-var apiURL	string = "https://api.telegram.org/bot"
-var apiToken	string = ""
+var pollingInterval	int    = 60
 
-func SetAPIURL(api string) {
-	apiURL = api;
+var running		bool
+var httpClient		http.Client
+
+func SetPollingInterval(t int) {
+	pollingInterval = t
 }
 
 func SetAPIToken(token string) {
-	apiToken = token;
+	methods.SetAPIToken(token)
 }
 
-func GetMe() string {
-	resp, err := http.Get(fmt.Sprintf("%s%s/getMe", apiURL, apiToken))
+func SetAPIURL(api string) {
+	methods.SetAPIURL(api)
+}
+
+func doPolling(start int) []methods.Update {
+	p := methods.GetUpdatesParam {
+					Offset:		start,
+					Timeout:	pollingInterval,
+				 }
+	updates, err := methods.GetUpdates(p)
+
 	if err != nil {
-		return ""
+		return nil
 	}
-	defer resp.Body.Close()
-	info, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return ""
+
+	log.Println("Polling once")
+
+	return updates
+}
+
+func processUpdates(updates []methods.Update) int {
+	nextOff := -1
+	for _, v := range(updates) {
+		fmt.Printf("Update %d\n", v.ID)
+		if v.ID > nextOff {
+			nextOff = v.ID
+		}
 	}
-	return string(info)
+	return nextOff + 1
+}
+
+func Run() {
+	running = true
+	off := 0
+	for updates := doPolling(-1);
+	    running;
+	    updates  = doPolling(off) {
+		off = processUpdates(updates)
+	}
 }
