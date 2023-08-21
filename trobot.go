@@ -8,17 +8,14 @@
 package trobot
 
 import (
-	"fmt"
-	"net/http"
-	"log"
-
 	"github.com/ziyao233/trobot/methods"
+	"github.com/ziyao233/trobot/logger"
        )
 
 var pollingInterval	int    = 60
 
 var running		bool
-var httpClient		http.Client
+var logPath		string = ""
 
 func SetPollingInterval(t int) {
 	pollingInterval = t
@@ -32,6 +29,14 @@ func SetAPIURL(api string) {
 	methods.SetAPIURL(api)
 }
 
+func SetLogPath(p string) {
+	logPath = p
+}
+
+func SetLogLevel(l logger.Level) {
+	logger.SetLogLevel(l)
+}
+
 func doPolling(start int) []methods.Update {
 	p := methods.GetUpdatesParam {
 					Offset:		start,
@@ -40,10 +45,9 @@ func doPolling(start int) []methods.Update {
 	updates, err := methods.GetUpdates(p)
 
 	if err != nil {
+		logger.Log(logger.LError, err)
 		return nil
 	}
-
-	log.Println("Polling once")
 
 	return updates
 }
@@ -51,7 +55,7 @@ func doPolling(start int) []methods.Update {
 func processUpdates(updates []methods.Update) int {
 	nextOff := -1
 	for _, v := range(updates) {
-		fmt.Printf("Update %d\n", v.ID)
+		logger.Debugf("Update %d\n", v.ID)
 		if v.ID > nextOff {
 			nextOff = v.ID
 		}
@@ -60,6 +64,7 @@ func processUpdates(updates []methods.Update) int {
 }
 
 func Run() {
+	logger.Init(logPath)
 	running = true
 	off := 0
 	for updates := doPolling(-1);
