@@ -37,7 +37,7 @@ func SetLogLevel(l logger.Level) {
 	logger.SetLogLevel(l)
 }
 
-func doPolling(start int) []methods.Update {
+func doPolling(start int64) []methods.Update {
 	p := methods.GetUpdatesParam {
 					Offset:		start,
 					Timeout:	pollingInterval,
@@ -52,10 +52,11 @@ func doPolling(start int) []methods.Update {
 	return updates
 }
 
-func processUpdates(updates []methods.Update) int {
-	nextOff := -1
+func processUpdates(updates []methods.Update) int64 {
+	var nextOff int64 = -1
 	for _, v := range(updates) {
 		logger.Debugf("Update %d\n", v.ID)
+		logger.Debug(v.Message)
 		if v.ID > nextOff {
 			nextOff = v.ID
 		}
@@ -66,7 +67,9 @@ func processUpdates(updates []methods.Update) int {
 func Run() {
 	logger.Init(logPath)
 	running = true
-	off := 0
+
+	var off int64 = 0
+
 	for updates := doPolling(-1);
 	    running;
 	    updates  = doPolling(off) {

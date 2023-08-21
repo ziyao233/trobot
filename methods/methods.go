@@ -15,6 +15,8 @@ import (
 	"bytes"
 	"errors"
 	"log"
+
+	"github.com/ziyao233/trobot/types"
        )
 
 var apiURL		string		= "https://api.telegram.org/bot"
@@ -70,13 +72,14 @@ func call(method string, param interface{}) (result interface{}, err error) {
 }
 
 type GetUpdatesParam struct {
-	Offset		int		`json:"offset"`
+	Offset		int64		`json:"offset"`
 	Timeout		int		`json:"timeout"`
 	Allowed		[]string	`json:"allowed_updates,omitempty"`
 }
 
 type Update struct {
-	ID		int
+	ID		int64
+	Message		types.Message
 }
 
 func GetUpdates(p GetUpdatesParam) (update []Update, err error) {
@@ -90,9 +93,17 @@ func GetUpdates(p GetUpdatesParam) (update []Update, err error) {
 	update = make([]Update, len(rawUpdates))
 	for i, v := range(rawUpdates) {
 		gUpdate := v.(map[string]interface{})
-		update[i] = Update{ ID: int(gUpdate["update_id"].(float64)) }
+		update[i] = parseUpdate(gUpdate)
 		i++
 	}
 
 	return
+}
+
+func parseUpdate(i interface{}) Update {
+	return Update{
+			ID:		int64(types.FFloat64(i, "update_id")),
+			Message:
+				types.ToMessage(types.FGeneric(i, "message")),
+		     }
 }
