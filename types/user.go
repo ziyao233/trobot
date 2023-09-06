@@ -20,12 +20,11 @@ func ToUser(i interface{}) User {
 		return User{}
 	}
 
-	s := i.(map[string]interface{})
 	return User{
-			ID:		int64(s["id"].(float64)),
-			FirstName:	s["first_name"].(string),
-			LastName:	s["last_name"].(string),
-			Username:	s["username"].(string),
-			IsBot:		s["is_bot"].(bool),
+			ID:		int64(FFloat64(i, "id")),
+			FirstName:	FString(i, "first_name"),
+			LastName:	FString(i, "last_name"),
+			Username:	FString(i, "username"),
+			IsBot:		FBool(i, "is_bot"),
 		   }
 }
