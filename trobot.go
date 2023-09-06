@@ -56,15 +56,17 @@ func doPolling(start int64) []methods.Update {
 func processUpdates(updates []methods.Update) int64 {
 	var nextOff int64 = -1
 	for _, v := range(updates) {
-		logger.Debugf("Update %d\n", v.ID)
 		logger.Debug(v.Message)
-		_, err := command.Handle(&v.Message)
+		if v.ID > nextOff {
+			nextOff = v.ID
+		}
+
+		ok, err := command.Handle(&v.Message)
 		if err != nil {
 			logger.Error(err)
 		}
-
-		if v.ID > nextOff {
-			nextOff = v.ID
+		if ok {
+			continue
 		}
 	}
 	return nextOff + 1

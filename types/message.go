@@ -13,6 +13,7 @@ type Message struct {
 	Date		int64		`json:"date"`
 	Chat		Chat		`json:"chat"`
 	Text		string		`json:"text"`
+	RepliedMessage	*Message	`json:"reply_to_message"`
 }
 
 func ToMessage(i interface {}) Message {
@@ -20,12 +21,15 @@ func ToMessage(i interface {}) Message {
 		return Message{}
 	}
 
+	replied := ToMessage(FGeneric(i, "reply_to_message"))
+
 	return Message{
 			ID:		int64(FFloat64(i, "message_id")),
 			From:		ToUser(FGeneric(i, "from")),
 			Date:		int64(FFloat64(i, "Date")),
 			Chat:		ToChat(FGeneric(i, "chat")),
 			Text:		FString(i, "text"),
+			RepliedMessage:	&replied,
 		      }
 }
 
