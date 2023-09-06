@@ -66,6 +66,14 @@ func Fatalf(f string, args ...any) {
 	os.Exit(1)
 }
 
+func Error(args ...any) {
+	Log(LError, args...)
+}
+
+func Errorf(f string, args ...any) {
+	Logf(LError, f, args...)
+}
+
 func Debug(args ...any) {
 	Log(LDebug, args...)
 }

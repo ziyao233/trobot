@@ -10,6 +10,7 @@ package trobot
 import (
 	"github.com/ziyao233/trobot/methods"
 	"github.com/ziyao233/trobot/logger"
+	"github.com/ziyao233/trobot/command"
        )
 
 var pollingInterval	int    = 60
@@ -57,6 +58,11 @@ func processUpdates(updates []methods.Update) int64 {
 	for _, v := range(updates) {
 		logger.Debugf("Update %d\n", v.ID)
 		logger.Debug(v.Message)
+		_, err := command.Handle(&v.Message)
+		if err != nil {
+			logger.Error(err)
+		}
+
 		if v.ID > nextOff {
 			nextOff = v.ID
 		}

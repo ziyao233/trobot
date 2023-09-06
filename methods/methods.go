@@ -14,9 +14,9 @@ import (
 	"io"
 	"bytes"
 	"errors"
-	"log"
 
 	"github.com/ziyao233/trobot/types"
+	"github.com/ziyao233/trobot/logger"
        )
 
 var apiURL		string		= "https://api.telegram.org/bot"
@@ -85,7 +85,7 @@ type Update struct {
 func GetUpdates(p GetUpdatesParam) (update []Update, err error) {
 	gUpdates, err := call("getUpdates", p)
 	if err != nil {
-		log.Println(err)
+		logger.Error(err)
 		return nil, err
 	}
 	rawUpdates := gUpdates.([]interface{})
