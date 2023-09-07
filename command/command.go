@@ -12,6 +12,7 @@ import (
 type Command struct {
 	Message			*types.Message
 	Args			[]string
+	Markup			string
 }
 
 type handler struct {
@@ -50,6 +51,7 @@ func (c Command) Println(args... any) {
 	methods.SendMessage(methods.SendMessageParam{
 						Text:	fmt.Sprintln(args...),
 						ChatID:	c.Message.Chat.ID,
+						ParseMode: c.Markup,
 					}, true)
 }
 
@@ -57,6 +59,7 @@ func (c Command) Printf(f string, args... any) {
 	methods.SendMessage(methods.SendMessageParam{
 						Text:	fmt.Sprintf(f, args...),
 						ChatID:	c.Message.Chat.ID,
+						ParseMode: c.Markup,
 					}, true)
 }
 
@@ -65,6 +68,7 @@ func (c Command) Reply(args... any) {
 						Text:	fmt.Sprintln(args...),
 						ChatID:	c.Message.Chat.ID,
 						ReplyTo:c.Message.ID,
+						ParseMode: c.Markup,
 					}, true)
 }
 
@@ -73,5 +77,24 @@ func (c Command) Replyf(f string, args... any) {
 						Text:	fmt.Sprintf(f, args...),
 						ChatID:	c.Message.Chat.ID,
 						ReplyTo:c.Message.ID,
+						ParseMode: c.Markup,
+					}, true)
+}
+
+func (c Command) ReplyTo(ID int64, args... any) {
+	methods.SendMessage(methods.SendMessageParam{
+						Text:	fmt.Sprintln(args...),
+						ChatID:	c.Message.Chat.ID,
+						ReplyTo:ID,
+						ParseMode: c.Markup,
+					}, true)
+}
+
+func (c Command) ReplyTof(ID int64, f string, args... any) {
+	methods.SendMessage(methods.SendMessageParam{
+						Text:	fmt.Sprintf(f, args...),
+						ChatID:	c.Message.Chat.ID,
+						ReplyTo:ID,
+						ParseMode: c.Markup,
 					}, true)
 }

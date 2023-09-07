@@ -15,6 +15,7 @@ type SendMessageParam struct {
 	ChatID			int64	`json:"chat_id"`
 	Text			string	`json:"text"`
 	ReplyTo			int64	`json:"reply_to_message_id"`
+	ParseMode		string	`json:"parse_mode"`
 }
 
 func SendMessage(p SendMessageParam, force bool) error {
