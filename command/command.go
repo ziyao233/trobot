@@ -25,11 +25,12 @@ func Register(cmd string, fn func (Command) error) {
 }
 
 func Handle(msg *types.Message) (bool, error) {
-	if !strings.HasPrefix(msg.Text, "/") {
+	text, found := strings.CutPrefix(msg.Text, "/")
+	if !found {
 		return false, nil
 	}
 
-	args := parseCommand(msg.Text)
+	args := parseCommand(text)
 	if len(args) < 1 {
 		return false, nil
 	}
@@ -40,7 +41,7 @@ func Handle(msg *types.Message) (bool, error) {
 	}
 }
 
-var cmdlineRegex *regexp.Regexp = regexp.MustCompile(`[\w]+`)
+var cmdlineRegex *regexp.Regexp = regexp.MustCompile(`\S+`)
 func parseCommand(s string) []string {
 	return cmdlineRegex.FindAllString(s, -1)
 }
