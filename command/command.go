@@ -30,6 +30,9 @@ func Handle(msg *types.Message) (bool, error) {
 	}
 
 	args := parseCommand(msg.Text)
+	if len(args) < 1 {
+		return false, nil
+	}
 	if handler, ok := commands[args[0]]; ok {
 		return true, handler.fn(Command{ Message: msg, Args: args })
 	} else {
